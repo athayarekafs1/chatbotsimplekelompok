@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Chatbot</title>
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    #chat { border: 1px solid #ccc; height: 300px; overflow-y: scroll; padding: 10px; }
+    input { width: 80%; }
+  </style>
+</head>
+<body>
+  <h1>Chatbot Sederhana</h1>
+  <div id="chat"></div>
+  <input id="userInput" placeholder="Ketik pesan...">
+  <button onclick="sendMessage()">Kirim</button>
+  <script>
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('userInput');
+
+    function sendMessage() {
+      const message = input.value;
+      if (!message) return;
+      chat.innerHTML += `<p><strong>Anda:</strong> ${message}</p>`;
+      input.value = '';
+
+      // Kirim ke Dialogflow API (ganti YOUR_PROJECT_ID dan YOUR_ACCESS_TOKEN)
+      fetch('https://dialogflow.googleapis.com/v2/projects/chatbot-simple-480114/agent/sessions/123456:detectIntent', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer AIzaSyApNHdKNU33EnVz47csbqRkRnf2py-IXc4',  // Dapatkan dari Google Cloud IAM
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          queryInput: { text: { text: message, languageCode: 'id' } }
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        const reply = data.queryResult.fulfillmentText;
+        chat.innerHTML += `<p><strong>Bot:</strong> ${reply}</p>`;
+        chat.scrollTop = chat.scrollHeight;
+      });
+    }
+  </script>
+</body>
+</html>
